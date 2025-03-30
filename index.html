@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo List App</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --background-color: #f5f6fa;
+            --success-color: #2ecc71;
+            --danger-color: #e74c3c;
+            --warning-color: #f1c40f;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--background-color);
+            color: var(--primary-color);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .auth-container {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            max-width: 400px;
+            margin: 2rem auto;
+        }
+
+        .toggle-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .toggle-buttons button {
+            flex: 1;
+            padding: 0.8rem;
+            border: none;
+            background: #ecf0f1;
+            color: var(--primary-color);
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-buttons button:hover {
+            background: var(--secondary-color);
+            color: white;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        input {
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+
+        button {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: var(--secondary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2980b9;
+        }
+
+        .btn-success {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .btn-warning {
+            background: var(--warning-color);
+            color: black;
+        }
+
+        .btn-danger {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .todo-container {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+
+        .todo-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .todo-actions {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .todo-actions input {
+            flex: 1;
+        }
+
+        .todo-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .todo-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .todo-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .todo-item.completed {
+            background: #ecf0f1;
+            opacity: 0.8;
+        }
+
+        .todo-item.completed span {
+            text-decoration: line-through;
+        }
+
+        .todo-actions-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .welcome-message {
+            color: var(--secondary-color);
+            margin-bottom: 0;
+        }
+
+        .edit-input {
+            flex: 1;
+            margin-right: 1rem;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            .auth-container {
+                padding: 1.5rem;
+            }
+            
+            .todo-actions {
+                flex-direction: column;
+            }
+            
+            .todo-actions-buttons {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Authentication Section -->
+        <div class="auth-container">
+            <div class="toggle-buttons">
+                <button onclick="showForm('signup')">Sign Up</button>
+                <button onclick="showForm('signin')">Sign In</button>
+            </div>
+
+            <!-- Sign Up Form -->
+            <form id="signupForm" class="hidden">
+                <h2>Create Account</h2>
+                <input type="text" id="firstName" placeholder="First Name" required>
+                <input type="text" id="lastName" placeholder="Last Name" required>
+                <input type="email" id="signupEmail" placeholder="Email Address" required>
+                <input type="password" id="signupPassword" placeholder="Create Password" required>
+                <button type="button" class="btn-primary" onclick="signUp()">Sign Up</button>
+            </form>
+
+            <!-- Sign In Form -->
+            <form id="signinForm" class="hidden">
+                <h2>Welcome Back</h2>
+                <input type="email" id="signinEmail" placeholder="Email Address" required>
+                <input type="password" id="signinPassword" placeholder="Password" required>
+                <button type="button" class="btn-primary" onclick="signIn()">Sign In</button>
+            </form>
+        </div>
+
+        <!-- Todo Dashboard -->
+        <div class="todo-container hidden">
+            <div class="todo-header">
+                <h2 class="welcome-message">Welcome, <span id="userName"></span></h2>
+                <button class="btn-danger" onclick="logout()">Logout</button>
+            </div>
+            
+            <div class="todo-actions">
+                <input type="text" id="todoInput" placeholder="Enter new task">
+                <button class="btn-success" onclick="addTodo()">Add Task</button>
+            </div>
+            
+            <div class="todo-list" id="todoList"></div>
+        </div>
+    </div>
+
+    <script>
+        let currentUser = null;
+        let todos = [];
+
+        // Clear form inputs
+        function clearForm(formId) {
+            document.getElementById(formId).reset();
+        }
+
+        // Authentication Functions
+        function showForm(formType) {
+            document.getElementById('signupForm').classList.toggle('hidden', formType !== 'signup');
+            document.getElementById('signinForm').classList.toggle('hidden', formType !== 'signin');
+        }
+
+        function signUp() {
+            const user = {
+                firstName: document.getElementById('firstName').value,
+                lastName: document.getElementById('lastName').value,
+                email: document.getElementById('signupEmail').value,
+                password: document.getElementById('signupPassword').value,
+                todos: []
+            };
+
+            if(localStorage.getItem(user.email)) {
+                alert('User already exists!');
+                return;
+            }
+
+            localStorage.setItem(user.email, JSON.stringify(user));
+            alert('Account created successfully!');
+            clearForm('signupForm');
+            showForm('signin');
+        }
+
+        function signIn() {
+            const email = document.getElementById('signinEmail').value;
+            const password = document.getElementById('signinPassword').value;
+            const user = JSON.parse(localStorage.getItem(email));
+
+            if (user && user.password === password) {
+                currentUser = user;
+                todos = user.todos;
+                clearForm('signinForm');
+                showTodoDashboard();
+            } else {
+                alert('Invalid credentials!');
+            }
+        }
+
+        function logout() {
+            currentUser = null;
+            document.querySelector('.auth-container').classList.remove('hidden');
+            document.querySelector('.todo-container').classList.add('hidden');
+        }
+
+        // Todo Functions
+        function showTodoDashboard() {
+            document.querySelector('.auth-container').classList.add('hidden');
+            document.querySelector('.todo-container').classList.remove('hidden');
+            document.getElementById('userName').textContent = `${currentUser.firstName} ${currentUser.lastName}`;
+            renderTodos();
+        }
+
+        function addTodo() {
+            const input = document.getElementById('todoInput');
+            const text = input.value.trim();
+            
+            if(text) {
+                todos.push({
+                    text: text,
+                    completed: false,
+                    id: Date.now(),
+                    editing: false
+                });
+                input.value = '';
+                updateUserData();
+                renderTodos();
+            }
+        }
+
+        function deleteTodo(id) {
+            todos = todos.filter(todo => todo.id !== id);
+            updateUserData();
+            renderTodos();
+        }
+
+        function toggleComplete(id) {
+            todos = todos.map(todo => 
+                todo.id === id ? {...todo, completed: !todo.completed} : todo
+            );
+            updateUserData();
+            renderTodos();
+        }
+
+        function startEditing(id) {
+            todos = todos.map(todo => 
+                todo.id === id ? {...todo, editing: true} : todo
+            );
+            renderTodos();
+        }
+
+        function saveEdit(id) {
+            const newText = document.getElementById(`editInput-${id}`).value.trim();
+            if(newText) {
+                todos = todos.map(todo => 
+                    todo.id === id ? {...todo, text: newText, editing: false} : todo
+                );
+                updateUserData();
+                renderTodos();
+            }
+        }
+
+        function updateUserData() {
+            currentUser.todos = todos;
+            localStorage.setItem(currentUser.email, JSON.stringify(currentUser));
+        }
+
+        function renderTodos() {
+            const todoList = document.getElementById('todoList');
+            todoList.innerHTML = todos.map(todo => `
+                <div class="todo-item ${todo.completed ? 'completed' : ''}">
+                    ${todo.editing ? `
+                        <input type="text" id="editInput-${todo.id}" 
+                               value="${todo.text}" class="edit-input">
+                        <div class="todo-actions-buttons">
+                            <button class="btn-success" onclick="saveEdit(${todo.id})">Save</button>
+                            <button class="btn-danger" onclick="deleteTodo(${todo.id})">Cancel</button>
+                        </div>
+                    ` : `
+                        <span>${todo.text}</span>
+                        <div class="todo-actions-buttons">
+                            <button class="btn-success" onclick="toggleComplete(${todo.id})">
+                                ${todo.completed ? 'Undo' : '✓'}
+                            </button>
+                            <button class="btn-warning" onclick="startEditing(${todo.id})">Edit</button>
+                            <button class="btn-danger" onclick="deleteTodo(${todo.id})">✗</button>
+                        </div>
+                    `}
+                </div>
+            `).join('');
+        }
+    </script>
+</body>
+</html>
